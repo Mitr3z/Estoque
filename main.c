@@ -57,111 +57,110 @@ int main() {
     scanf("%d", &opcao);
 
     switch (opcao) {
-      case 1:
-        if (numProdutos < MAX_PRODUTOS) {
-          printf("Digite o nome do produto: ");
-          scanf("%s", nome[numProdutos]);
-          printf("Digite o código do produto: ");
-          scanf("%d", &codigo[numProdutos]);
-          printf("Digite o valor do produto: ");
-          scanf("%f", &valor[numProdutos]);
-          printf("Digite a quantidade em estoque: ");
-          scanf("%d", &qtdd[numProdutos]);
-          numProdutos++;
+    case 1:
+      if (numProdutos < MAX_PRODUTOS) {
+        printf("Digite o nome do produto: ");
+        scanf("%s", nome[numProdutos]);
+        printf("Digite o código do produto: ");
+        scanf("%d", &codigo[numProdutos]);
+        printf("Digite o valor do produto: ");
+        scanf("%f", &valor[numProdutos]);
+        printf("Digite a quantidade em estoque: ");
+        scanf("%d", &qtdd[numProdutos]);
+        numProdutos++;
 
-          FILE *arquivo = fopen("estoque.csv", "a");
+        FILE *arquivo = fopen("estoque.csv", "a");
 
-          if (arquivo == NULL) {
-            perror("Erro ao abrir o arquivo");
-            exit(EXIT_FAILURE);
+        if (arquivo == NULL) {
+          perror("Erro ao abrir o arquivo");
+          exit(EXIT_FAILURE);
+        }
+
+        fprintf(arquivo, "%s,%d,%.2f,%d\n", nome[numProdutos - 1],
+                codigo[numProdutos - 1], valor[numProdutos - 1],
+                qtdd[numProdutos - 1]);
+
+        fclose(arquivo);
+
+        printf("Produto cadastrado com sucesso!\n");
+      } else {
+        printf("Limite de produtos atingido. Não é possível cadastrar mais "
+               "produtos.\n");
+      }
+      break;
+
+    case 2:
+      printf("\nProdutos Cadastrados: %d\n", numProdutos);
+      for (int i = 0; i < numProdutos; i++) {
+        printf("Produto: %s\n", nome[i]);
+        printf("Código: %d\n", codigo[i]);
+        printf("Valor: %.2f\n", valor[i]);
+        printf("Quantidade em Estoque: %d\n\n", qtdd[i]);
+      }
+      break;
+
+    case 3: {
+      int codigoMod;
+      int encontrado = 0;
+
+      printf("Digite o código do produto que deseja modificar: ");
+      scanf("%d", &codigoMod);
+
+      for (int i = 0; i < numProdutos; i++) {
+        if (codigo[i] == codigoMod) {
+          printf("Produto encontrado. O que você deseja modificar?\n");
+          printf("1. Produto\n");
+          printf("2. Valor\n");
+          printf("3. Quantidade em Estoque\n");
+          printf("Escolha uma opção: ");
+
+          int opcaoMod;
+          scanf("%d", &opcaoMod);
+
+          switch (opcaoMod) {
+          case 1:
+            printf("Novo produto: ");
+            scanf("%s", nome[i]);
+            break;
+
+          case 2:
+            printf("Novo valor: ");
+            scanf("%f", &valor[i]);
+            break;
+
+          case 3:
+            printf("Nova quantidade em estoque: ");
+            scanf("%d", &qtdd[i]);
+            break;
+
+          default:
+            printf("Opção inválida.\n");
           }
 
-          fprintf(arquivo, "%s,%d,%.2f,%d\n", nome[numProdutos - 1],
-                  codigo[numProdutos - 1], valor[numProdutos - 1],
-                  qtdd[numProdutos - 1]);
+          encontrado = 1;
 
-          fclose(arquivo);
+          salvarNoArquivo(nome, codigo, valor, qtdd, numProdutos);
 
-          printf("Produto cadastrado com sucesso!\n");
-        } else {
-          printf("Limite de produtos atingido. Não é possível cadastrar mais produtos.\n");
+          printf("Produto modificado com sucesso!\n");
+          break;
         }
-        break;
+      }
 
-      case 2:
-        printf("\nProdutos Cadastrados: %d\n",numProdutos);
-        for (int i = 0; i < numProdutos; i++) {
-          printf("Produto: %s\n", nome[i]);
-          printf("Código: %d\n", codigo[i]);
-          printf("Valor: %.2f\n", valor[i]);
-          printf("Quantidade em Estoque: %d\n\n", qtdd[i]);
-        }
-        break;
+      if (!encontrado) {
+        printf("Produto não encontrado.\n");
+      }
+    } break;
 
-      case 3:
-        {
-          int codigoMod;
-          int encontrado = 0;
+    case 4:
+      excluirProduto(nome, codigo, valor, qtdd, &numProdutos);
+      break;
 
-          printf("Digite o código do produto que deseja modificar: ");
-          scanf("%d", &codigoMod);
+    case 0:
+      printf("Saindo do programa.\n");
+      break;
 
-          for (int i = 0; i < numProdutos; i++) {
-            if (codigo[i] == codigoMod) {
-              printf("Produto encontrado. O que você deseja modificar?\n");
-              printf("1. Produto\n");
-              printf("2. Valor\n");
-              printf("3. Quantidade em Estoque\n");
-              printf("Escolha uma opção: ");
-
-              int opcaoMod;
-              scanf("%d", &opcaoMod);
-
-              switch (opcaoMod) {
-                case 1:
-                  printf("Novo produto: ");
-                  scanf("%s", nome[i]);
-                  break;
-
-                case 2:
-                  printf("Novo valor: ");
-                  scanf("%f", &valor[i]);
-                  break;
-
-                case 3:
-                  printf("Nova quantidade em estoque: ");
-                  scanf("%d", &qtdd[i]);
-                  break;
-
-                default:
-                  printf("Opção inválida.\n");
-              }
-
-              encontrado = 1;
-
-              salvarNoArquivo(nome, codigo, valor, qtdd, numProdutos);
-
-              printf("Produto modificado com sucesso!\n");
-              break;
-            }
-          }
-
-          if (!encontrado) {
-            printf("Produto não encontrado.\n");
-          }
-        }
-        break;
-
-      case 4:
-        excluirProduto(nome, codigo, valor, qtdd, &numProdutos);
-        break;
-
-      case 0:
-        printf("Saindo do programa.\n");
-        break;
-
-      default:
-        printf("Opção inválida. Tente novamente.\n");
+    default:
+      printf("Opção inválida. Tente novamente.\n");
     }
   } while (opcao != 0);
 
@@ -198,13 +197,14 @@ void excluirProduto(char nome[MAX_PRODUTOS][50], int codigo[MAX_PRODUTOS],
 
   for (int i = 0; i < *numProdutos; i++) {
     if (codigo[i] == codigoExcluir) {
-      printf("Produto encontrado. Tem certeza que deseja excluir? (1 - Sim, 0 - Não): ");
+      printf("Produto encontrado. Tem certeza que deseja excluir? (1 - Sim, 0 "
+             "- Não): ");
 
       int confirmacao;
       scanf("%d", &confirmacao);
 
       if (confirmacao == 1) {
-        
+
         strcpy(nome[i], nome[*numProdutos - 1]);
         codigo[i] = codigo[*numProdutos - 1];
         valor[i] = valor[*numProdutos - 1];
